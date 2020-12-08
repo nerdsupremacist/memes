@@ -15,7 +15,7 @@ jobs:
         xcode-version: latest
     - uses: actions/cache@v2
       with:
-        path: Server/.build
+        path: .build
         key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
         restore-keys: |
           ${{ runner.os }}-spm-
@@ -31,7 +31,7 @@ jobs:
       run: apt-get update && apt-get install -y --no-install-recommends libsqlite3-dev
     - uses: actions/cache@v2
       with:
-        path: Server/.build
+        path: .build
         key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
         restore-keys: |
           ${{ runner.os }}-spm-
