@@ -1,0 +1,44 @@
+name: Build Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: maxim-lobanov/setup-xcode@v1.1
+      with:
+        xcode-version: latest
+    - uses: actions/cache@v2
+      with:
+        path: Server/.build
+        key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+        restore-keys: |
+          ${{ runner.os }}-spm-
+    - name: Build
+      working-directory: Server
+      run: swift build
+  linux:
+    container:
+      image: swift:bionic
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install libsqlite3
+      run: apt-get update && apt-get install -y --no-install-recommends libsqlite3-dev
+    - uses: actions/cache@v2
+      with:
+        path: Server/.build
+        key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+        restore-keys: |
+          ${{ runner.os }}-spm-
+    - name: Check Swift version
+      run: swift --version
+    - name: Build
+      working-directory: Server
+      run: swift build
+    
