@@ -24,3 +24,17 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./Bundle
+  server:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Deploy to dokku
+      id: deploy
+      uses: idoberko2/dokku-deploy-github-action@v1
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        dokku-host: '78.47.176.210'
+        app-name: 'memes'
