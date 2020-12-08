@@ -9,6 +9,10 @@ extension ServerSideEvent {
         return .successfullyJoined(player: player.model())
     }
 
+    static func currentPlayers(players: [Player]) -> ServerSideEvent {
+        return .currentPlayers(players: players.map { $0.model() })
+    }
+
     static func playerJoined(player: Player) -> ServerSideEvent {
         return .playerJoined(player: player.model())
     }

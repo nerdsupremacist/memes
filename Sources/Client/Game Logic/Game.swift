@@ -77,6 +77,8 @@ extension Game {
                     self.gameID = id
                 case .successfullyJoined(let player):
                     self.current = player
+                case .currentPlayers(let players):
+                    self.otherPlayers.append(contentsOf: players)
                 case .playerJoined(let player):
                     self.otherPlayers.append(player)
                 case .playerLeft(let player):

@@ -95,6 +95,9 @@ class Game {
                 player.isHost = true
             }
             send(event: .playerJoined(player: player))
+            if !players.isEmpty {
+                player.send(event: .currentPlayers(players: players))
+            }
             players.append(player)
             player.send(event: .successfullyJoined(player: player))
         }
