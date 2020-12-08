@@ -1,4 +1,4 @@
-name: Deploy (Client + Server)
+name: Deploy
 
 on:
   push:
