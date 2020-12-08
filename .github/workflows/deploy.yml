@@ -10,6 +10,12 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: .build
+          key: ${{ runner.os }}-spm-wasm-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-wasm-
       - uses: swiftwasm/swiftwasm-action@v5.3
         with:
           shell-action: carton bundle --product memes-client
