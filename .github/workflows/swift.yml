@@ -20,8 +20,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-spm-
     - name: Build
-      working-directory: Server
-      run: swift build
+      run: swift build --product memes-server
   linux:
     container:
       image: swift:bionic
@@ -39,6 +38,5 @@ jobs:
     - name: Check Swift version
       run: swift --version
     - name: Build
-      working-directory: Server
-      run: swift build
+      run: swift build --product memes-server
     
