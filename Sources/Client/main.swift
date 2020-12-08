@@ -4,7 +4,11 @@ import OpenCombine
 import JavaScriptKit
 
 struct Memes: App {
+    #if DEBUG
     let game = Game(webSocket: WebSocket(url: URL(string: "ws://localhost:3000/game")!))
+    #else
+    let game = Game(webSocket: WebSocket(url: URL(string: "ws://memes.apps.quintero.io/game")!))
+    #endif
 
     var body: some Scene {
         WindowGroup("Memes") {
