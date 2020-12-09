@@ -76,7 +76,7 @@ class Game {
         }
     }
 
-    init(rounds: Int, deck: Deck = StandardDeck(), gameEndCompletion: @escaping (Game) -> Void) {
+    init(rounds: Int, deck: Deck = StandardDeck.basic, gameEndCompletion: @escaping (Game) -> Void) {
         self.rounds = rounds
         self.deck = deck
         self.gameEndCompletion = gameEndCompletion

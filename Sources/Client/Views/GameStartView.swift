@@ -8,124 +8,118 @@ struct GameStartView: View {
     var game: Game
 
     @State
-    var isNumber = true
+    private var kind: Kind? = nil
 
-    @State
-    var rounds = "5"
-
-    @State
-    var name: String = ""
-
-    func start() {
-        guard let rounds = Int(rounds) else {
-            isNumber = false
-            return
-        }
-        game.configure(rounds: rounds)
+    enum Kind {
+        case start
+        case join
     }
+
+    var body: some View {
+        switch kind {
+        case .none:
+            ChooseKindView(kind: $kind)
+        case .some(.start):
+            StartANewGameView(game: game)
+        case .some(.join):
+            JoinAGameView(game: game)
+        }
+    }
+}
+
+private struct ChooseKindView: View {
+    @Binding
+    var kind: GameStartView.Kind?
 
     var body: some View {
         VStack {
             Text("Welcome!").font(.title).fontWeight(.heavy)
+            Text("This is a game where you pick the captions for memes.").font(.callout).fontWeight(.regular)
+            Text("One person get's to decide which is the funniest.").font(.callout).fontWeight(.regular)
 
-            Divider().padding(.vertical, 8)
-            Divider()
-            Divider().padding(.vertical, 8)
+            Spacer().frame(width: 0, height: 16)
+
+            Text("Let's see who the funniest/most horrible person in your group is...").font(.callout).fontWeight(.regular)
+
+            Spacer().frame(width: 0, height: 4)
 
             HStack {
-                StartANewGameView(game: game)
+                ButtonWithNumberKeyPress("Start a Game", character: "1") {
+                    kind = .start
+                }
 
-                Circle().frame(width: 5, height: 5).foregroundColor(.primary)
-
-                JoinAGameView(game: game)
+                ButtonWithNumberKeyPress("Join a Game", character: "2") {
+                    kind = .join
+                }
             }
-            .padding(.horizontal, 32)
         }
     }
 }
 
 struct JoinAGameView: View {
-    @ObservedObject
     var game: Game
 
     @State
-    var room = ""
-
-    @State
-    var name: String = ""
+    private var room = ""
 
     func start() {
         game.join(id: GameID(rawValue: room))
-        game.register(name: name, emoji: "")
     }
 
     var body: some View {
         VStack {
-            Text("Join a Game").font(.title2)
+            Text("Enter the Room #").font(.title)
+            Text("The person hosting the game should've given you a code by now...").font(.callout).fontWeight(.regular)
 
-            TextField("Name",
-                      text: $name).padding(16)
+            Spacer().frame(width: 0, height: 4)
 
-            TextField("Room #",
-                      text: $room,
-                      onEditingChanged: { _ in }) {
-
-                start()
-            }
-            .padding(.bottom, 16)
-
-            Button("Join") {
-                start()
-            }
+            CustomTextField(placeholder: "Room #", text: $room) { start() }
         }
     }
 }
 
-struct StartANewGameView: View {
-    @ObservedObject
-    var game: Game
+struct NumberOfRoundsButton: View {
+    let number: Int
+    let game: Game
 
-    @State
-    var isNumber = true
-
-    @State
-    var rounds = "5"
-
-    @State
-    var name: String = ""
-
-    func start() {
-        guard let rounds = Int(rounds) else {
-            isNumber = false
-            return
+    var body: some View {
+        ButtonWithNumberKeyPress(character: String(number % 10).first!, action: { game.configure(rounds: number) }) {
+            NumberOfRoundsContent(number: number)
         }
-        game.configure(rounds: rounds)
-        game.register(name: name, emoji: "")
     }
+}
+
+struct NumberOfRoundsContent: View {
+    @Environment(\.colorScheme)
+    var colorScheme
+    let number: Int
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 20).fill(colorScheme == .light ? Color.black : Color.white)
+
+            Text(String(number)).foregroundColor(colorScheme == .light ? Color.white : Color.black).font(.title3)
+        }
+        .frame(width: 100, height: 100)
+    }
+}
+
+struct StartANewGameView: View {
+    let game: Game
 
     var body: some View {
         VStack {
-            Text("Start a Game").font(.title2)
+            Text("How many rounds").font(.title)
 
-            TextField("Name",
-                      text: $name).padding(16)
+            Text("In every round each player will have a turn judging everyone else's submissions.").font(.callout).fontWeight(.regular)
+            Text("If you don't get it, don't worry. You'll learn by playing...").font(.callout).fontWeight(.regular)
 
-            if !isNumber {
-                Text("Please choose a number")
-                    .font(.caption)
-                    .foregroundColor(.red)
-            }
+            Spacer().frame(width: 0, height: 4)
 
-            TextField("# of Rounds",
-                      text: $rounds,
-                      onEditingChanged: { _ in }) {
-
-                start()
-            }
-            .padding(.bottom, 16)
-
-            Button("Create") {
-                start()
+            HStack {
+                ForEach(0..<10) { number in
+                    NumberOfRoundsButton(number: number + 1, game: game)
+                }
             }
         }
     }

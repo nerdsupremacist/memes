@@ -14,6 +14,8 @@ struct GameRootView: View {
                     GameView(game: game)
                 case (.none, .none):
                     GameStartView(game: game)
+                case (.some, .none):
+                    RegisterUserView(game: game)
                 default:
                     Text("Loading...")
                 }
@@ -28,5 +30,26 @@ struct GameRootView: View {
                 )
             }
         }
+    }
+}
+
+struct RegisterUserView: View {
+    let game: Game
+
+    @State
+    private var name: String = ""
+
+    func start() {
+        guard !name.isEmpty else { return }
+        game.register(name: name, emoji: name)
+    }
+
+    var body: some View {
+        Text("What's your name").font(.title)
+        Text("Or your nickname. Whatever...").font(.callout).fontWeight(.regular)
+
+        Spacer().frame(width: 0, height: 4)
+
+        CustomTextField(placeholder: "Name", text: $name) { start() }
     }
 }
