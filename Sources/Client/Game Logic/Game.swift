@@ -52,6 +52,9 @@ class Game: ObservableObject {
     @Published
     private(set) var history: [ChosenMeme] = []
 
+    @Published
+    private(set) var error: GameError?
+
     private let webSocket: WebSocket
     private var cancellables: Set<AnyCancellable> = []
 
@@ -71,8 +74,12 @@ extension Game {
         cancellables = []
         webSocket
             .messages(type: ServerSideEvent.self)
-            .sink { value in
-                switch value {
+            .sink { [unowned self] event in
+                #if DEBUG
+                print("Event received: \(event)")
+                #endif
+
+                switch event {
                 case .initialized(let id):
                     self.gameID = id
                 case .successfullyJoined(let player):
@@ -99,8 +106,13 @@ extension Game {
                     fatalError()
                 case .judgeChange(_):
                     fatalError()
-                case .error(_):
-                    fatalError()
+                case .error(.gameNotFound):
+                    send(event: .deregister)
+                    self.gameID = nil
+                    self.current = nil
+                    self.error = .gameNotFound
+                case .error(let error):
+                    self.error = error
                 case .end(_):
                     fatalError()
                 }
@@ -112,34 +124,48 @@ extension Game {
 
 extension Game {
     func configure(rounds: Int) {
+        error = nil
         send(event: .configure(rounds: rounds))
     }
 
+    func join(id: GameID) {
+        error = nil
+        self.gameID = id
+        send(event: .join(id: id))
+    }
+
     func register(name: String, emoji: String) {
+        error = nil
         send(event: .register(name: name, emoji: emoji))
     }
 
     func start() {
+        error = nil
         send(event: .start)
     }
 
     func play(card: Card) {
+        error = nil
         send(event: .play(card))
     }
 
     func freestyle(text: String) {
+        error = nil
         send(event: .freestyle(text))
     }
 
     func choose(text: String) {
+        error = nil
         send(event: .choose(text))
     }
 
     func end() {
+        error = nil
         send(event: .end)
     }
 
     func leave() {
+        error = nil
         webSocket.close()
     }
 }
