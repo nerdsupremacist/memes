@@ -6,13 +6,35 @@ import JavaScriptKit
 class WebSocket {
     private static let constructor = JSObject.global.WebSocket.function!
     private let object: JSObject
+    private var queue: [String] = []
+    private var isOpen = false
 
     init(url: URL) {
         self.object = Self.constructor.new(url.absoluteString)
+
+        var closure: JSClosure?
+        closure = JSClosure { [weak self] _ -> Void in
+            guard let self = self else { return }
+            self.isOpen = true
+            for message in self.queue {
+                self.send(message)
+            }
+            if let closure = closure {
+                closure.release()
+                _ = self.object.removeEventListener!("open", closure)
+            }
+            closure = nil
+        }
+
+        _ = object.addEventListener!("open", closure)
     }
 
     func send(_ message: String) {
-        _ = object.send!(message)
+        if isOpen {
+            _ = object.send!(message)
+        } else {
+            queue.append(message)
+        }
     }
 
     func close() {
