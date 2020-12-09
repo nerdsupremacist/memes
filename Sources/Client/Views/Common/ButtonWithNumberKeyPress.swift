@@ -22,15 +22,6 @@ struct ButtonWithNumberKeyPress<Content : View>: View {
         self.action = action
     }
 
-    var isLonger: Bool {
-        switch character {
-        case .enter, .space:
-            return true
-        default:
-            return false
-        }
-    }
-
     var body: some View {
         VStack {
             DynamicHTML(
@@ -56,14 +47,14 @@ struct ButtonWithNumberKeyPress<Content : View>: View {
 
                 switch character {
                 case .enter:
-                    Text("Enter").foregroundColor(colorScheme == .light ? Color.white : Color.black)
+                    Text("⏎").foregroundColor(colorScheme == .light ? Color.white : Color.black)
                 case .space:
-                    Text("Space").foregroundColor(colorScheme == .light ? Color.white : Color.black)
+                    Text("␣").foregroundColor(colorScheme == .light ? Color.white : Color.black)
                 default:
                     Text(String(character)).foregroundColor(colorScheme == .light ? Color.white : Color.black)
                 }
             }
-            .frame(width: isLonger ? 100 : 30, height: 30)
+            .frame(width: 30, height: 30)
         }.onAppear {
             self.listener = KeypressListener(for: character) { (isPressed: Bool) in
                 if isPressed {
@@ -100,7 +91,7 @@ struct SomeButtonLook: View {
 
             Text(text).foregroundColor(colorScheme == .light ? Color.white : Color.black).font(.title3)
         }
-        .frame(width: 200, height: 100)
+        .frame(width: 200, height: 70)
     }
 }
 
