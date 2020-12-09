@@ -6,6 +6,7 @@ public enum ClientEvent {
     case join(id: GameID)
     case configure(rounds: Int)
     case register(name: String, emoji: String)
+    case deregister
     case start
     case play(Card)
     case freestyle(String)
@@ -17,6 +18,7 @@ extension ClientEvent {
     enum Kind: String, Codable {
         case join
         case register
+        case deregister
         case configure
         case start
         case play
@@ -51,6 +53,8 @@ extension ClientEvent: Encodable {
             try container.encode(Kind.register, forKey: .kind)
             try container.encode(name, forKey: .name)
             try container.encode(emoji, forKey: .emoji)
+        case .deregister:
+            try container.encode(Kind.deregister, forKey: .kind)
         case .start:
             try container.encode(Kind.start, forKey: .kind)
         case .play(let card):
@@ -79,6 +83,8 @@ extension ClientEvent: Decodable {
             self = .configure(rounds: try container.decode(Int.self, forKey: .rounds))
         case .register:
             self = .register(name: try container.decode(String.self, forKey: .name), emoji: try container.decode(String.self, forKey: .emoji))
+        case .deregister:
+            self = .deregister
         case .start:
             self = .start
         case .play:

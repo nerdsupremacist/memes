@@ -33,6 +33,9 @@ extension Game {
 
     static func handle(event: ClientEvent, for gameRef: inout Game?, from playerRef: inout Player?, using socket: WebSocket) {
         switch (event, gameRef, playerRef) {
+        case (.deregister, .none, .some):
+            playerRef = nil
+            
         case (.configure(let rounds), .none, _):
             let game = Game(rounds: rounds) { game in
                 lock.withLock {
@@ -47,7 +50,10 @@ extension Game {
             triggerJoin(game: gameRef, player: playerRef)
 
         case (.join(let id), .none, _):
-            gameRef = lock.withLock { games[id] }
+            guard let game = lock.withLock({ games[id] }) else {
+                return socket.send(event: .error(.gameNotFound))
+            }
+            gameRef = game
             triggerJoin(game: gameRef, player: playerRef)
 
         case (.register(let name, let emoji), _, .none):
