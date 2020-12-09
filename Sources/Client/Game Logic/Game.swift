@@ -53,7 +53,7 @@ class Game: ObservableObject {
     private(set) var history: [ChosenMeme] = []
 
     @Published
-    private(set) var error: GameError?
+    var error: GameError?
 
     private let webSocket: WebSocket
     private var cancellables: Set<AnyCancellable> = []
@@ -112,9 +112,7 @@ extension Game {
                 case .judgeChange(_):
                     fatalError()
                 case .error(.gameNotFound):
-                    send(event: .deregister)
                     self.gameID = nil
-                    self.current = nil
                     self.error = .gameNotFound
                 case .error(let error):
                     self.error = error
