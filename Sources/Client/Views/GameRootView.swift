@@ -7,28 +7,17 @@ struct GameRootView: View {
     var game: Game
 
     var body: some View {
-        ZStack {
-            VStack {
-                switch (game.gameID, game.current) {
-                case (.some, .some):
-                    GameView(game: game)
-                case (.none, .none):
-                    GameStartView(game: game)
-                case (.some, .none):
-                    RegisterUserView(game: game)
-                default:
-                    Text("Loading...")
-                }
-            }
-
-            if let error = game.error {
-                AnyView(
-                    VStack {
-                        ErrorView(error: error, game: game)
-                        Spacer()
-                    }
-                )
-            }
+        switch (game.error, game.gameID, game.current) {
+        case (.some(let error), _, _):
+            ErrorView(error: error, game: game)
+        case (.none, .some, .some):
+            GameView(game: game)
+        case (.none, .none, .none):
+            GameStartView(game: game)
+        case (.none, .some, .none):
+            RegisterUserView(game: game)
+        default:
+            Text("Loading...")
         }
     }
 }
@@ -45,11 +34,13 @@ struct RegisterUserView: View {
     }
 
     var body: some View {
-        Text("What's your name").font(.title)
-        Text("Or your nickname. Whatever...").font(.callout).fontWeight(.regular)
+        VStack {
+            Text("What's your name").font(.title)
+            Text("Or your nickname. Whatever...").font(.callout).fontWeight(.regular)
 
-        Spacer().frame(width: 0, height: 4)
+            Spacer().frame(width: 0, height: 4)
 
-        CustomTextField(placeholder: "Name", text: $name) { start() }
+            CustomTextField(placeholder: "Name", text: $name) { start() }
+        }
     }
 }

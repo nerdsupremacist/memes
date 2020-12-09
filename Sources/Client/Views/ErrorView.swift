@@ -9,54 +9,16 @@ struct ErrorView: View {
     let game: Game
 
     var body: some View {
-        DIV(class: "ui icon message") {
-            Icon(name: .exclamationCircle)
-            DIV(class: "content") {
-                DIV(class: "header") {
-                    Text("An Error Occurred")
-                }
-                Paragraph(error.errorDescription(game: game))
+        VStack {
+            Text("An Error Occurred").font(.title).foregroundColor(.primary)
+            Text(error.errorDescription(game: game)).font(.callout).foregroundColor(.secondary)
+
+            Spacer().frame(width: 0, height: 32)
+
+            ButtonWithNumberKeyPress("Continue", character: .space) {
+                game.error = nil
             }
         }
-    }
-}
-
-struct Icon: View {
-    enum Name: String {
-        case inbox
-        case exclamationCircle = "exclamation circle"
-    }
-
-    let name: Name
-
-    var body: some View {
-        HTML("i", ["class" : "\(name.rawValue) icon"])
-    }
-}
-
-struct DIV<Content : View>: View {
-    let className: String
-    let content: Content
-
-    init(class className: String, @ViewBuilder content: () -> Content) {
-        self.className = className
-        self.content = content()
-    }
-
-    var body: some View {
-        HTML("div", ["class" : className]) { content }
-    }
-}
-
-struct Paragraph: View {
-    let text: String
-
-    init(_ text: String) {
-        self.text = text
-    }
-
-    var body: some View {
-        return HTML("p") { Text(text) }
     }
 }
 
