@@ -44,6 +44,7 @@ struct ButtonWithNumberKeyPress<Content : View>: View {
 
             ZStack {
                 RoundedRectangle(cornerRadius: 5).fill(colorScheme == .light ? Color.black : Color.white)
+                    .frame(width: 30, height: 30)
 
                 switch character {
                 case .enter:
@@ -88,6 +89,7 @@ struct SomeButtonLook: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20).fill(colorScheme == .light ? Color.black : Color.white)
+                .frame(width: 200, height: 70)
 
             Text(text).foregroundColor(colorScheme == .light ? Color.white : Color.black).font(.title3)
         }

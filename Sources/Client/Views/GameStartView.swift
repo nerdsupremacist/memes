@@ -97,6 +97,7 @@ struct NumberOfRoundsContent: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20).fill(colorScheme == .light ? Color.black : Color.white)
+                .frame(width: 100, height: 100)
 
             Text(String(number)).foregroundColor(colorScheme == .light ? Color.white : Color.black).font(.title3)
         }
