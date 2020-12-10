@@ -13,6 +13,7 @@ class Game: ObservableObject {
         case collecting(CollectingMeme)
         case freestyle(CollectingMeme)
         case choosing(ChoosingMeme)
+        case chosen(ChosenMeme, next: CollectingMeme?)
         case ended
     }
     
@@ -104,15 +105,26 @@ extension Game {
                 case .newCards(let cards):
                     self.cards.append(contentsOf: cards)
                 case .collecting(let meme):
-                    state = .collecting(CollectingMeme(judge: meme.judge, image: meme.image, playerSubmissions: []))
+                    let next = CollectingMeme(judge: meme.judge, image: meme.image, playerSubmissions: [])
+                    if case .chosen(let chosen, _) = state {
+                        state = .chosen(chosen, next: next)
+                    } else {
+                        state = .collecting(next)
+                    }
                 case .freeStyle:
                     guard case .collecting(let meme) = state else { fatalError("Invalid state change") }
                     state = .freestyle(meme)
                 case .update(let update):
                     switch state {
-                    case .collecting(var meme), .freestyle(var meme):
+                    case .collecting(var meme):
                         meme.playerSubmissions = update.submitted
                         state = .collecting(meme)
+                    case .freestyle(var meme):
+                        meme.playerSubmissions = update.submitted
+                        state = .freestyle(meme)
+                    case .chosen(let chosen, .some(var meme)):
+                        meme.playerSubmissions = update.submitted
+                        state = .chosen(chosen, next: meme)
                     default:
                         fatalError("Invalid state change")
                     }
@@ -125,7 +137,9 @@ extension Game {
                     }
                 case .chosen(let update):
                     guard case .choosing(let meme) = state else { fatalError("Invalid state change") }
-                    history.append(ChosenMeme(judge: meme.judge, image: meme.image, winner: update.winner, others: update.others))
+                    let chosen = ChosenMeme(judge: meme.judge, image: meme.image, winner: update.winner, others: update.others)
+                    state = .chosen(chosen, next: nil)
+                    history.append(chosen)
                 case .judgeChange(let judge):
                     switch state {
                     case .collecting(let meme):
@@ -171,6 +185,12 @@ extension Game {
     func start() {
         error = nil
         send(event: .start)
+    }
+
+    func `continue`() {
+        if case .chosen(_, .some(let next)) = state {
+            state = .collecting(next)
+        }
     }
 
     func play(card: Card) {
