@@ -44,7 +44,7 @@ class Game {
             case (.collecting, .choosing(let meme)):
                 send(event: .choosing(meme))
 
-            case (.collecting(let meme), .ended):
+            case (.choosing(let meme), .ended):
                 if meme.winningCard != nil {
                     send(event: .chosen(meme))
                 }
@@ -211,6 +211,8 @@ class Game {
             return player.send(event: .error(.cannotPlayTwiceForTheSameCard))
         }
 
+        player.cards.removeFirst(card)
+
         switch card {
         case .freestyle:
             meme.proposedLines = []
@@ -252,6 +254,7 @@ class Game {
 
         history.append(meme)
         meme.winningCard = chosen
+        chosen.player.winCount += 1
         judgeIndex = (judgeIndex + 1) % players.count
         if (judgeIndex == 0 && history.count >= rounds * players.count) {
             end()

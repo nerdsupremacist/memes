@@ -17,6 +17,8 @@ struct GameView: View {
             FreestyleView(game: game, meme: meme)
         case .choosing(let meme):
             ChoosingView(game: game, meme: meme)
+        case .chosen(let meme, _, _):
+            ChosenView(game: game, meme: meme)
         default:
             Text("State not implemented")
         }
@@ -140,9 +142,11 @@ struct CollectingView: View {
                         ForEach(meme.playerSubmissions, id: \.id) { player in
                             Text("\(player.emoji) \(player.name)").font(.callout)
                         }
+                        Spacer()
                     }
+                    .frame(height: 330)
                 } else {
-                    EmptyView()
+                    EmptyView().frame(height: 330)
                 }
             }
 
@@ -180,7 +184,10 @@ struct FreestyleView: View {
             Spacer()
 
             if let current = game.current, meme.judge.id != current.id && !meme.playerSubmissions.map({ $0.id }).contains(current.id) {
-                CustomTextField(placeholder: "Your submission", text: $text) { game.freestyle(text: text) }
+                VStack {
+                    CustomTextField(placeholder: "Your submission", text: $text) { game.freestyle(text: text) }
+                }
+                .frame(height: 330)
             } else {
                 if !meme.playerSubmissions.isEmpty {
                     VStack {
@@ -189,10 +196,59 @@ struct FreestyleView: View {
                             Text("\(player.emoji) \(player.name)").font(.callout)
                         }
                     }
+                    .frame(height: 330)
                 } else {
                     EmptyView()
+                        .frame(height: 330)
                 }
             }
+
+            Spacer().frame(width: 0, height: 64)
+        }
+    }
+}
+
+struct ChosenView: View {
+    @ObservedObject
+    var game: Game
+    let meme: Game.ChosenMeme
+
+    var body: some View {
+        VStack {
+            Spacer().frame(width: 0, height: 64)
+
+            Text("The judge has spoken!").font(.title).foregroundColor(.primary)
+            if meme.judge.id == game.current?.id {
+                Text("I mean, you have spoken...").font(.callout).foregroundColor(.secondary)
+            } else {
+                HStack {
+                    Text("Judge: ").font(.callout).foregroundColor(.secondary)
+                    Text("\(meme.judge.emoji) \(meme.judge.name)").font(.callout).foregroundColor(.secondary)
+                }
+            }
+
+            Spacer()
+
+            HStack {
+                VStack {
+                    Text("Meme:").font(.title3).foregroundColor(.primary)
+                    Image(meme.image.absoluteString).frame(height: 350)
+                }
+
+                Spacer().frame(width: 16, height: 0)
+
+                VStack {
+                    Text("Winner:").font(.title3).foregroundColor(.primary)
+                    CardContentView(card: .text(meme.winner.text))
+                    Text("\(meme.winner.player.emoji) \(meme.winner.player.name)").font(.callout)
+                    Text("\(meme.winner.player.winCount) Points").font(.callout)
+                }
+            }
+
+            Spacer()
+
+
+            ButtonWithNumberKeyPress("Next", character: .enter) { game.continue() }
 
             Spacer().frame(width: 0, height: 64)
         }

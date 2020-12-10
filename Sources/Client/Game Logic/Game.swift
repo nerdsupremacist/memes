@@ -1,3 +1,4 @@
+import JavaScriptKit
 import Foundation
 import TokamakDOM
 import OpenCombine
@@ -13,7 +14,7 @@ class Game: ObservableObject {
         case collecting(CollectingMeme)
         case freestyle(CollectingMeme)
         case choosing(ChoosingMeme)
-        case chosen(ChosenMeme, next: CollectingMeme?)
+        case chosen(ChosenMeme, next: CollectingMeme?, atEnd: Bool)
         case ended
     }
     
@@ -37,7 +38,21 @@ class Game: ObservableObject {
     }
 
     @Published
-    private(set) var gameID: GameID?
+    private(set) var gameID: GameID? {
+        didSet {
+            let window = JSObject.global.window.object!
+            guard var components = window["location"].object?["href"].string.flatMap(URLComponents.init(string:)) else { return }
+            let withoutID = components.queryItems?.filter { $0.name != "id" } ?? []
+            let idParam = gameID.map { [URLQueryItem(name: "id", value: $0.rawValue)] } ?? []
+            components.queryItems = idParam + withoutID
+            if components.query!.isEmpty {
+                components.queryItems = nil
+            }
+            if let string = components.string {
+                _ = window["history"].object!.replaceState?([:], "", string)
+            }
+        }
+    }
 
     @Published
     private(set) var state: State = .initialized
@@ -106,8 +121,8 @@ extension Game {
                     self.cards.append(contentsOf: cards)
                 case .collecting(let meme):
                     let next = CollectingMeme(judge: meme.judge, image: meme.image, playerSubmissions: [])
-                    if case .chosen(let chosen, _) = state {
-                        state = .chosen(chosen, next: next)
+                    if case .chosen(let chosen, _, false) = state {
+                        state = .chosen(chosen, next: next, atEnd: false)
                     } else {
                         state = .collecting(next)
                     }
@@ -122,15 +137,15 @@ extension Game {
                     case .freestyle(var meme):
                         meme.playerSubmissions = update.submitted
                         state = .freestyle(meme)
-                    case .chosen(let chosen, .some(var meme)):
+                    case .chosen(let chosen, .some(var meme), false):
                         meme.playerSubmissions = update.submitted
-                        state = .chosen(chosen, next: meme)
+                        state = .chosen(chosen, next: meme, atEnd: false)
                     default:
                         fatalError("Invalid state change")
                     }
                 case .choosing(let update):
                     switch state {
-                    case .collecting(let meme), .freestyle(let meme):
+                    case .collecting(let meme), .freestyle(let meme), .chosen(_, .some(let meme), false):
                         state = .choosing(ChoosingMeme(judge: meme.judge, image: meme.image, submissions: update.proposals))
                     default:
                         fatalError("Invalid state change")
@@ -138,7 +153,7 @@ extension Game {
                 case .chosen(let update):
                     guard case .choosing(let meme) = state else { fatalError("Invalid state change") }
                     let chosen = ChosenMeme(judge: meme.judge, image: meme.image, winner: update.winner, others: update.others)
-                    state = .chosen(chosen, next: nil)
+                    state = .chosen(chosen, next: nil, atEnd: false)
                     history.append(chosen)
                 case .judgeChange(let judge):
                     switch state {
@@ -156,8 +171,14 @@ extension Game {
                     self.error = .gameNotFound
                 case .error(let error):
                     self.error = error
-                case .end(_):
-                    fatalError()
+                case .end(let players):
+                    self.otherPlayers = players.filter { $0.id == current?.id }
+                    self.current = players.first { $0.id == current?.id }
+                    if case .chosen(let meme, .none, _) = state {
+                        state = .chosen(meme, next: nil, atEnd: true)
+                    } else {
+                        state = .ended
+                    }
                 }
             }
             .store(in: &cancellables)
@@ -188,12 +209,18 @@ extension Game {
     }
 
     func `continue`() {
-        if case .chosen(_, .some(let next)) = state {
+        switch state {
+        case .chosen(_, .some(let next), false):
             state = .collecting(next)
+        case .chosen(_, .none, true):
+            state = .ended
+        default:
+            break
         }
     }
 
     func play(card: Card) {
+        cards.removeFirst(card)
         error = nil
         send(event: .play(card))
     }

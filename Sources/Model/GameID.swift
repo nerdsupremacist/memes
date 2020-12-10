@@ -7,7 +7,7 @@ public struct GameID: RawRepresentable, Codable, Hashable {
     public init() {
         let array = [UInt8].random(count: 4)
         let data = Data(array)
-        self.rawValue = data.base64EncodedString().replacingOccurrences(of: "=", with: "")
+        self.rawValue = data.base64EncodedString().replacingOccurrences(of: "[^a-zA-Z0-9-]", with: "", options: .regularExpression)
     }
 
     public init(rawValue: String) {
