@@ -172,7 +172,7 @@ extension Game {
                 case .error(let error):
                     self.error = error
                 case .end(let players):
-                    self.otherPlayers = players.filter { $0.id == current?.id }
+                    self.otherPlayers = players.filter { $0.id != current?.id }
                     self.current = players.first { $0.id == current?.id }
                     if case .chosen(let meme, .none, _) = state {
                         state = .chosen(meme, next: nil, atEnd: true)

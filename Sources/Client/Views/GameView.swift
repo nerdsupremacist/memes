@@ -19,8 +19,49 @@ struct GameView: View {
             ChoosingView(game: game, meme: meme)
         case .chosen(let meme, _, _):
             ChosenView(game: game, meme: meme)
-        default:
-            Text("State not implemented")
+        case .ended:
+            HighscoreListView(game: game)
+        }
+    }
+}
+
+struct HighscoreListView: View {
+    @ObservedObject
+    var game: Game
+
+    var players: [Player] {
+        let all = [game.current].compactMap { $0 } + game.otherPlayers
+        return all.sorted { lhs, rhs in
+            if lhs.winCount > rhs.winCount {
+                return true
+            }
+
+            if lhs.winCount == rhs.winCount {
+                return lhs.name < rhs.name
+            }
+
+            return false
+        }
+    }
+
+    var body: some View {
+        VStack {
+            Text("That's it!").font(.title).foregroundColor(.primary)
+            Text("Here's the final scores").font(.callout).foregroundColor(.secondary)
+
+            Spacer().frame(width: 0, height: 4)
+            ForEach(players, id: \.id) { player in
+                HStack {
+                    Text("\(player.emoji) \(player.name)").font(.callout)
+                    Circle().frame(width: 5, height: 5)
+                    Text("\(player.winCount) Memes").font(.callout)
+                }
+            }
+
+            if game.current?.isHost == true {
+                Spacer().frame(width: 0, height: 32)
+                ButtonWithNumberKeyPress("Play again", character: .enter, action: { game.start() })
+            }
         }
     }
 }
@@ -86,7 +127,7 @@ struct ChoosingView: View {
             if let current = game.current, meme.judge.id != current.id {
                 HStack {
                     ForEach(meme.submissions, id: \.self) { submission in
-                        CardContentView(card: .text(submission)).padding(.horizontal, 4)
+                        CardContentView(card: .text(submission)).padding(.horizontal, 8)
                     }
                 }
             } else {
@@ -232,14 +273,17 @@ struct ChosenView: View {
             HStack {
                 VStack {
                     Text("Meme:").font(.title3).foregroundColor(.primary)
-                    Image(meme.image.absoluteString).frame(height: 350)
+                    Spacer().frame(width: 0, height: 4)
+                    Image(meme.image.absoluteString).frame(height: 360)
                 }
 
                 Spacer().frame(width: 16, height: 0)
 
                 VStack {
                     Text("Winner:").font(.title3).foregroundColor(.primary)
+                    Spacer().frame(width: 0, height: 8)
                     CardContentView(card: .text(meme.winner.text))
+                    Spacer().frame(width: 0, height: 8)
                     Text("\(meme.winner.player.emoji) \(meme.winner.player.name)").font(.callout)
                     Text("\(meme.winner.player.winCount) Points").font(.callout)
                 }

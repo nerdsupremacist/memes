@@ -45,30 +45,36 @@ class WebSocket {
         let object = self.object
         let subject = PassthroughSubject<String, Never>()
 
-        var listeners: [JSValue] = []
-        var closures: [JSClosure] = []
-
         let onMessage = JSClosure { arguments -> Void in
             let event = arguments.first!.object!
             let data = event["data"].string!
             subject.send(data)
         }
 
-        let onClose = JSClosure { arguments -> Void in
-            for listener in listeners {
-                _ = self.object.removeEventListener!(listener)
-            }
+        var onClose: JSClosure?
+        onClose = JSClosure { arguments -> Void in
+            _ = self.object.removeEventListener!("message", onMessage)
+            _ = self.object.removeEventListener!("close", onClose)
             subject.send(completion: .finished)
-            for closure in closures {
-                closure.release()
-            }
+            onMessage.release()
+            onClose?.release()
         }
 
-        closures = [onMessage, onClose]
+        _ = object.addEventListener!("message", onMessage)
+        _ = object.addEventListener!("close", onClose)
+        return subject.eraseToAnyPublisher()
+    }
 
-        listeners.append(object.addEventListener!("message", onMessage))
-        listeners.append(object.addEventListener!("close", onClose))
-        listeners.append(object.addEventListener!("onError", onClose))
+    func onClose() -> AnyPublisher<Void, Never> {
+        let subject = PassthroughSubject<Void, Never>()
+        var onClose: JSClosure?
+        onClose = JSClosure { arguments -> Void in
+            _ = self.object.removeEventListener!("close", onClose)
+            subject.send(completion: .finished)
+            onClose?.release()
+        }
+
+        _ = object.addEventListener!("close", onClose)
         return subject.eraseToAnyPublisher()
     }
 }
