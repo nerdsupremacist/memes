@@ -1,3 +1,4 @@
+import Foundation
 import TokamakDOM
 import OpenCombine
 import Model
@@ -17,19 +18,19 @@ class Game: ObservableObject {
     
     struct CollectingMeme {
         var judge: Player
-        var image: String?
+        var image: URL
         var playerSubmissions: [Player]
     }
 
     struct ChoosingMeme {
         var judge: Player
-        var image: String?
+        var image: URL
         var submissions: [String]
     }
 
     struct ChosenMeme {
         var judge: Player
-        var image: String?
+        var image: URL
         var winner: Proposal
         var others: [Proposal]
     }
@@ -95,22 +96,47 @@ extension Game {
                     self.otherPlayers.append(player)
                 case .playerLeft(let player):
                     self.otherPlayers.removeAll { $0.id == player.id }
-                case .newHost(_):
-                    fatalError()
+                case .newHost(let player):
+                    if player.id == current?.id {
+                        current?.isHost = true
+                    }
+                    // TODO: Mark another player as host (not important yet)
                 case .newCards(let cards):
                     self.cards.append(contentsOf: cards)
-                case .collecting(_):
-                    fatalError()
-                case .freeStyle(_):
-                    fatalError()
-                case .update(_):
-                    fatalError()
-                case .choosing(_):
-                    fatalError()
-                case .chosen(_):
-                    fatalError()
-                case .judgeChange(_):
-                    fatalError()
+                case .collecting(let meme):
+                    state = .collecting(CollectingMeme(judge: meme.judge, image: meme.image, playerSubmissions: []))
+                case .freeStyle:
+                    guard case .collecting(let meme) = state else { fatalError("Invalid state change") }
+                    state = .freestyle(meme)
+                case .update(let update):
+                    switch state {
+                    case .collecting(var meme), .freestyle(var meme):
+                        meme.playerSubmissions = update.submitted
+                        state = .collecting(meme)
+                    default:
+                        fatalError("Invalid state change")
+                    }
+                case .choosing(let update):
+                    switch state {
+                    case .collecting(let meme), .freestyle(let meme):
+                        state = .choosing(ChoosingMeme(judge: meme.judge, image: meme.image, submissions: update.proposals))
+                    default:
+                        fatalError("Invalid state change")
+                    }
+                case .chosen(let update):
+                    guard case .choosing(let meme) = state else { fatalError("Invalid state change") }
+                    history.append(ChosenMeme(judge: meme.judge, image: meme.image, winner: update.winner, others: update.others))
+                case .judgeChange(let judge):
+                    switch state {
+                    case .collecting(let meme):
+                        state = .collecting(CollectingMeme(judge: judge, image: meme.image, playerSubmissions: meme.playerSubmissions))
+                    case .freestyle(let meme):
+                        state = .freestyle(CollectingMeme(judge: judge, image: meme.image, playerSubmissions: meme.playerSubmissions))
+                    case .choosing(let meme):
+                        state = .choosing(ChoosingMeme(judge: judge, image: meme.image, submissions: meme.submissions))
+                    default:
+                        fatalError("Invalid state change")
+                    }
                 case .error(.gameNotFound):
                     self.gameID = nil
                     self.error = .gameNotFound
