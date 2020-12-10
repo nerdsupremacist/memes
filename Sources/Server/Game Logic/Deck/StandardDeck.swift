@@ -13,6 +13,11 @@ class StandardDeck: Deck {
         self.captions = captions
     }
 
+    func reshuffle() {
+        playedImages = []
+        playedCardText = []
+    }
+
     func card(for player: Player, in game: Game) -> Card {
         if Int.random(in: 0...100) < 5 {
             return .freestyle

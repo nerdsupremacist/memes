@@ -70,6 +70,7 @@ class WebSocket {
         var onClose: JSClosure?
         onClose = JSClosure { arguments -> Void in
             _ = self.object.removeEventListener!("close", onClose)
+            subject.send()
             subject.send(completion: .finished)
             onClose?.release()
         }

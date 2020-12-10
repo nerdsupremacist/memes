@@ -6,6 +6,8 @@ public enum ServerSideEvent {
     case initialized(id: GameID)
     case successfullyJoined(player: Player)
 
+    case playAgain
+
     case currentPlayers(players: [Player])
     case playerJoined(player: Player)
     case playerLeft(player: Player)
@@ -70,6 +72,8 @@ extension ServerSideEvent {
         case initialized
         case successfullyJoined
 
+        case playAgain
+
         case currentPlayers
         case playerJoined
         case playerLeft
@@ -111,6 +115,8 @@ extension ServerSideEvent: Decodable {
             self = .initialized(id: try container.decode(GameID.self, forKey: .id))
         case .successfullyJoined:
             self = .successfullyJoined(player: try container.decode(Player.self, forKey: .player))
+        case .playAgain:
+            self = .playAgain
         case .currentPlayers:
             self = .currentPlayers(players: try container.decode([Player].self, forKey: .players))
         case .playerJoined:
@@ -151,6 +157,8 @@ extension ServerSideEvent: Encodable {
         case .successfullyJoined(let player):
             try container.encode(Kind.successfullyJoined, forKey: .kind)
             try container.encode(player, forKey: .player)
+        case .playAgain:
+            try container.encode(Kind.playAgain, forKey: .kind)
         case .currentPlayers(let players):
             try container.encode(Kind.currentPlayers, forKey: .kind)
             try container.encode(players, forKey: .players)

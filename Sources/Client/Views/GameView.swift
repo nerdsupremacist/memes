@@ -19,8 +19,10 @@ struct GameView: View {
             ChoosingView(game: game, meme: meme)
         case .chosen(let meme, _, _):
             ChosenView(game: game, meme: meme)
-        case .ended:
+        case .done:
             HighscoreListView(game: game)
+        case .stopped:
+            Text("Thanks for playing!")
         }
     }
 }
@@ -53,14 +55,14 @@ struct HighscoreListView: View {
             ForEach(players, id: \.id) { player in
                 HStack {
                     Text("\(player.emoji) \(player.name)").font(.callout)
-                    Circle().frame(width: 5, height: 5)
+                    Circle().frame(width: 5, height: 5).foregroundColor(.primary).padding(.horizontal, 4)
                     Text("\(player.winCount) Memes").font(.callout)
                 }
             }
 
             if game.current?.isHost == true {
                 Spacer().frame(width: 0, height: 32)
-                ButtonWithNumberKeyPress("Play again", character: .enter, action: { game.start() })
+                ButtonWithNumberKeyPress("Play again", character: .enter, action: { game.playAgain() })
             }
         }
     }

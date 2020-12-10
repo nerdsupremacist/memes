@@ -11,7 +11,8 @@ public enum ClientEvent {
     case play(Card)
     case freestyle(String)
     case choose(String)
-    case end
+    case playAgain
+    case stop
 }
 
 extension ClientEvent {
@@ -24,7 +25,8 @@ extension ClientEvent {
         case play
         case freestyle
         case choose
-        case end
+        case playAgain
+        case stop
     }
 
     enum CodingKeys: String, CodingKey {
@@ -64,8 +66,10 @@ extension ClientEvent: Encodable {
         case .choose(let text):
             try container.encode(Kind.choose, forKey: .kind)
             try container.encode(text, forKey: .text)
-        case .end:
-            try container.encode(Kind.end, forKey: .kind)
+        case .playAgain:
+            try container.encode(Kind.playAgain, forKey: .kind)
+        case .stop:
+            try container.encode(Kind.stop, forKey: .kind)
         }
     }
 }
@@ -91,8 +95,10 @@ extension ClientEvent: Decodable {
             self = .freestyle(try container.decode(String.self, forKey: .text))
         case .choose:
             self = .choose(try container.decode(String.self, forKey: .text))
-        case .end:
-            self = .end
+        case .playAgain:
+            self = .playAgain
+        case .stop:
+            self = .stop
         }
     }
 }

@@ -9,7 +9,8 @@ class Game {
         case collecting(Meme)
         case freestyle(Meme)
         case choosing(Meme)
-        case ended
+        case done
+        case stopped
     }
 
     let id = GameID()
@@ -44,14 +45,19 @@ class Game {
             case (.collecting, .choosing(let meme)):
                 send(event: .choosing(meme))
 
-            case (.choosing(let meme), .ended):
+            case (.choosing(let meme), .done):
                 if meme.winningCard != nil {
                     send(event: .chosen(meme))
                 }
                 fallthrough
 
-            case (_, .ended):
+            case (_, .done):
                 send(event: .end(players: players))
+
+            case (.done, .initialized):
+                send(event: .playAgain)
+
+            case (_, .stopped):
                 gameEndCompletion(self)
 
             default:
@@ -73,7 +79,15 @@ class Game {
     }
 
     var hasEnded: Bool {
-        if case .ended = state {
+        if case .done = state {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    var hasStopped: Bool {
+        if case .stopped = state {
             return true
         } else {
             return false
@@ -112,13 +126,13 @@ class Game {
             guard players.contains(where: { $0.id == player.id }) else { return }
             players.removeAll { $0.id == player.id }
             if players.isEmpty {
-                end()
+                stop()
                 return
             }
 
             if hasStarted, players.count < 3 {
                 send(event: .error(.tooManyPlayersDroppedOut))
-                end()
+                stop()
                 return
             }
 
@@ -160,12 +174,15 @@ class Game {
             case (.choosing(let meme), .choose(let text)):
                 choose(text: text, for: meme, as: player)
 
-            case (_, .end):
+            case (.done, .playAgain):
+                playAgain(as: player)
+
+            case (_, .stop):
                 guard player.isHost else {
                     player.send(event: .error(.onlyTheHostCanEnd))
                     return
                 }
-                end()
+                stop()
 
             default:
                 player.send(event: .error(.illegalEvent))
@@ -257,13 +274,29 @@ class Game {
         chosen.player.winCount += 1
         judgeIndex = (judgeIndex + 1) % players.count
         if (judgeIndex == 0 && history.count >= rounds * players.count) {
-            end()
+            state = .done
         } else {
             state = .collecting(deck.meme(for: players[judgeIndex], in: self))
         }
     }
 
-    func end() {
-        self.state = .ended
+    func playAgain(as player: Player) {
+        guard player.isHost else { return player.send(event: .error(.onlyTheHostCanStart)) }
+        history = []
+        deck.reshuffle()
+        for player in players {
+            player.cards = []
+            player.winCount = 0
+        }
+        players.shuffle()
+        judgeIndex = 0
+        state = .initialized
+    }
+
+    func stop() {
+        self.state = .stopped
+        for player in players {
+            player.stop()
+        }
     }
 }

@@ -15,7 +15,8 @@ class Game: ObservableObject {
         case freestyle(CollectingMeme)
         case choosing(ChoosingMeme)
         case chosen(ChosenMeme, next: CollectingMeme?, atEnd: Bool)
-        case ended
+        case done
+        case stopped
     }
     
     struct CollectingMeme {
@@ -106,6 +107,13 @@ extension Game {
                     self.gameID = id
                 case .successfullyJoined(let player):
                     self.current = player
+                case .playAgain:
+                    self.error = nil
+                    self.current = self.current.map { Player(id: $0.id, emoji: $0.emoji, name: $0.name, winCount: 0, isHost: $0.isHost) }
+                    self.otherPlayers = self.otherPlayers.map { Player(id: $0.id, emoji: $0.emoji, name: $0.name, winCount: 0, isHost: $0.isHost) }
+                    self.history = []
+                    self.cards = []
+                    self.state = .initialized
                 case .currentPlayers(let players):
                     self.otherPlayers.append(contentsOf: players)
                 case .playerJoined(let player):
@@ -177,9 +185,18 @@ extension Game {
                     if case .chosen(let meme, .none, _) = state {
                         state = .chosen(meme, next: nil, atEnd: true)
                     } else {
-                        state = .ended
+                        state = .done
                     }
                 }
+            }
+            .store(in: &cancellables)
+
+        webSocket
+            .onClose()
+            .sink { [unowned self] in
+                self.current = nil
+                self.gameID = nil
+                self.state = .stopped
             }
             .store(in: &cancellables)
     }
@@ -213,7 +230,7 @@ extension Game {
         case .chosen(_, .some(let next), false):
             state = .collecting(next)
         case .chosen(_, .none, true):
-            state = .ended
+            state = .done
         default:
             break
         }
@@ -235,9 +252,14 @@ extension Game {
         send(event: .choose(text))
     }
 
-    func end() {
+    func playAgain() {
         error = nil
-        send(event: .end)
+        send(event: .playAgain)
+    }
+
+    func stop() {
+        error = nil
+        send(event: .stop)
     }
 
     func leave() {

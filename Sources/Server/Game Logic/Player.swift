@@ -28,6 +28,7 @@ class Player {
     }
 
     func stop() {
+        guard !webSocket.isClosed else { return }
         _ = webSocket.close(code: .normalClosure)
     }
 }
