@@ -84,7 +84,7 @@ struct ChoosingView: View {
             if let current = game.current, meme.judge.id != current.id {
                 HStack {
                     ForEach(meme.submissions, id: \.self) { submission in
-                        CardContentView(card: .text(submission))
+                        CardContentView(card: .text(submission)).padding(.horizontal, 4)
                     }
                 }
             } else {
@@ -233,12 +233,7 @@ struct CardView: View {
 
     var body: some View {
         ButtonWithNumberKeyPress(character: String(index + 1).first!, action: { game.play(card: card) }) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 20).fill(effectiveColorScheme == .light ? Color.black : Color.white)
-
-                Text(text).foregroundColor(effectiveColorScheme == .light ? Color.white : Color.black).font(.body).frame(width: 180)
-            }
-            .frame(width: 100, height: 200)
+            CardContentView(card: card)
         }
     }
 }
@@ -277,8 +272,10 @@ struct CardContentView: View {
         ZStack {
             RoundedRectangle(cornerRadius: 20).fill(effectiveColorScheme == .light ? Color.black : Color.white)
 
-            Text(text).foregroundColor(effectiveColorScheme == .light ? Color.white : Color.black).font(.body).frame(width: 180)
+            VStack {
+                Text(text).foregroundColor(effectiveColorScheme == .light ? Color.white : Color.black).font(.body).frame(width: 200-8)
+            }
         }
-        .frame(width: 100, height: 200)
+        .frame(width: 200, height: 300)
     }
 }

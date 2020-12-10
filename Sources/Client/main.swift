@@ -4,6 +4,15 @@ import OpenCombine
 import JavaScriptKit
 import Model
 
+let document = JSObject.global.document
+_ = document.head.object!.insertAdjacentHTML!("beforeend", #"""
+<style>
+span {
+    white-space: normal;
+}
+</style>
+"""#)
+
 struct Memes: App {
     let game: Game
 
