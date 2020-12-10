@@ -137,9 +137,9 @@ extension Game {
         send(event: .join(id: id))
     }
 
-    func register(name: String, emoji: String) {
+    func register(name: String) {
         error = nil
-        send(event: .register(name: name, emoji: emoji))
+        send(event: .register(name: name))
     }
 
     func start() {

@@ -60,6 +60,10 @@ class Game {
         }
     }
 
+    var emojis: Set<String> {
+        return Set(players.map { $0.emoji })
+    }
+
     var hasStarted: Bool {
         if case .initialized = state {
             return false

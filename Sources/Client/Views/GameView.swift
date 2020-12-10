@@ -16,14 +16,14 @@ struct GameView: View {
             if let player = game.current {
                 Spacer().frame(width: 0, height: 4)
                 Text("You").font(.title3).foregroundColor(.primary)
-                Text(player.name)
+                Text("\(player.emoji) \(player.name)").font(.callout)
             }
 
             if !game.otherPlayers.isEmpty {
                 Spacer().frame(width: 0, height: 4)
                 Text("Rest").font(.title3).foregroundColor(.primary)
                 ForEach(game.otherPlayers, id: \.id) { player in
-                    Text(player.name)
+                    Text("\(player.emoji) \(player.name)").font(.callout)
                 }
             }
 

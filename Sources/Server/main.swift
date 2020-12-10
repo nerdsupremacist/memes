@@ -31,6 +31,7 @@ app.webSocket("game") { request, socket in
 extension Game {
     private static let lock = Lock()
     private static var games: [GameID : Game] = [:]
+    private static let emojis = ["🤓", "✊", "🤴", "🥳", "🤗", "😎", "🥸", "🤪", "🤨", "😂", "🤑"]
 
     static func handle(event: ClientEvent, for gameRef: inout Game?, from playerRef: inout Player?, using socket: WebSocket) {
         switch (event, gameRef, playerRef) {
@@ -57,7 +58,13 @@ extension Game {
             gameRef = game
             triggerJoin(game: gameRef, player: playerRef)
 
-        case (.register(let name, let emoji), _, .none):
+        case (.register(let name), _, .none):
+            let alreadyGiven = gameRef?.emojis ?? []
+            var emoji: String
+            repeat {
+                emoji = emojis.randomElement()!
+            } while alreadyGiven.contains(emoji) || alreadyGiven.count == emojis.count
+
             let player = Player(emoji: emoji, name: name, isHost: false, webSocket: socket)
             playerRef = player
             triggerJoin(game: gameRef, player: playerRef)

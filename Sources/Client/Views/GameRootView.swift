@@ -30,7 +30,7 @@ struct RegisterUserView: View {
 
     func start() {
         guard !name.isEmpty else { return }
-        game.register(name: name, emoji: name)
+        game.register(name: name)
     }
 
     var body: some View {
