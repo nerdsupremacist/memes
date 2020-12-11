@@ -23,7 +23,10 @@ app.webSocket("game") { request, socket in
     socket.onClose.whenComplete { _ in
         guard let game = game, !game.hasStopped else { return }
         guard let player = player else {
-            return game.stop()
+            if !game.hasPlayers {
+                game.stop()
+            }
+            return
         }
         game.getOut(player: player)
     }

@@ -94,6 +94,10 @@ class Game {
         }
     }
 
+    var hasPlayers: Bool {
+        return !players.isEmpty
+    }
+
     init(rounds: Int, deck: Deck = StandardDeck.basic, gameEndCompletion: @escaping (Game) -> Void) {
         self.rounds = rounds
         self.deck = deck
