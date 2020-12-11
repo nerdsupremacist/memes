@@ -24,6 +24,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./Bundle
+          cname: memes.quintero.io
   server:
     runs-on: ubuntu-latest
     
