@@ -53,6 +53,7 @@ extension Game {
                 return socket.send(event: .error(.gameNotFound))
             }
             gameRef = game
+            socket.send(event: .initialized(id: id))
             triggerJoin(game: gameRef, player: playerRef)
 
         case (.register(let name), _, .none):
