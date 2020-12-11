@@ -1,12 +1,8 @@
-import JavaScriptKit
 import Foundation
-import TokamakDOM
-import OpenCombine
+import JavaScriptKit
 import Model
 import Events
-
-typealias ObservableObject = TokamakDOM.ObservableObject
-typealias Published = TokamakDOM.Published
+import CombineShim
 
 class Game: ObservableObject {
     enum State {

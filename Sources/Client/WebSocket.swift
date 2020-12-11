@@ -1,6 +1,6 @@
 
 import Foundation
-import OpenCombine
+import CombineShim
 import JavaScriptKit
 
 class WebSocket {
