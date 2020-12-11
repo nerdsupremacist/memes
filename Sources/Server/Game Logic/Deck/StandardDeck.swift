@@ -19,7 +19,7 @@ class StandardDeck: Deck {
     }
 
     func card(for player: Player, in game: Game) -> Card {
-        if Int.random(in: 0...100) < 5 {
+        if Int.random(in: 0...100) < 1 {
             return .freestyle
         }
 
