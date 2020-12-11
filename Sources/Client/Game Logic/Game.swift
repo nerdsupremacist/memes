@@ -172,6 +172,7 @@ extension Game {
                 case .error(.gameNotFound):
                     self.gameID = nil
                     self.error = .gameNotFound
+                    self.leave()
                 case .error(let error):
                     self.error = error
                 case .end(let players):
@@ -249,7 +250,6 @@ extension Game {
     }
 
     func leave() {
-        error = nil
         webSocket.close()
     }
 }
