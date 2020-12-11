@@ -12,7 +12,6 @@ class Game: ObservableObject {
         case choosing(ChoosingMeme)
         case chosen(ChosenMeme, next: CollectingMeme?, atEnd: Bool)
         case done
-        case stopped
     }
     
     struct CollectingMeme {
@@ -184,15 +183,6 @@ extension Game {
                         state = .done
                     }
                 }
-            }
-            .store(in: &cancellables)
-
-        webSocket
-            .onClose()
-            .sink { [unowned self] in
-                self.current = nil
-                self.gameID = nil
-                self.state = .stopped
             }
             .store(in: &cancellables)
     }

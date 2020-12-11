@@ -21,8 +21,6 @@ struct GameView: View {
             ChosenView(game: game, meme: meme)
         case .done:
             HighscoreListView(game: game)
-        case .stopped:
-            Text("Thanks for playing!")
         }
     }
 }

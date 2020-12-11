@@ -10,8 +10,6 @@ struct GameRootView: View {
 
     var body: some View {
         switch (game.state, game.error, game.gameID, game.current) {
-        case (.stopped, _, _, _):
-            ConnectionLostView(error: game.error)
         case (_, .some(let error), _, _):
             ErrorView(error: error, game: game)
         case (_, .none, .some, .some):
@@ -22,28 +20,6 @@ struct GameRootView: View {
             RegisterUserView(game: game)
         default:
             Text("Loading...")
-        }
-    }
-}
-
-struct ConnectionLostView: View {
-    let error: GameError?
-
-    var body: some View {
-        VStack {
-            Text("Session Ended").font(.title).foregroundColor(.primary)
-            if case .some = error {
-                Text("Game was ended because too many users dropped out").font(.callout).foregroundColor(.secondary)
-            } else {
-                Text("There was a connection problem").font(.callout).foregroundColor(.secondary)
-            }
-
-            Spacer().frame(width: 0, height: 32)
-
-            ButtonWithNumberKeyPress("Go back to menu", character: .enter) {
-                let location = JSObject.global.window.object!["location"].object!
-                _ = location.reload!()
-            }
         }
     }
 }
