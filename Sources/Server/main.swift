@@ -9,7 +9,8 @@ app.webSocket("game") { request, socket in
     var game: Game?
     var player: Player?
 
-    socket.onText { _, text in
+    socket.pingInterval = .seconds(20)
+    socket.onText { socket, text in
         guard let data = text.data(using: .utf8),
               let event = try? JSONDecoder().decode(ClientEvent.self, from: data) else {
 
