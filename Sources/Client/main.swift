@@ -11,6 +11,15 @@ span {
     white-space: normal;
 }
 </style>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-H3T3MC2E5E"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-H3T3MC2E5E');
+</script>
 """#)
 
 struct Memes: App {
