@@ -414,8 +414,13 @@ struct CardContentView: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 20).fill(effectiveColorScheme == .light ? Color.black : Color.white)
+            RoundedRectangle(cornerRadius: 21)
+                .fill(effectiveColorScheme == .light ? Color.white : Color.black)
                 .frame(width: 200, height: 300)
+
+            RoundedRectangle(cornerRadius: 20)
+                .fill(effectiveColorScheme == .light ? Color.black : Color.white)
+                .frame(width: 198, height: 298)
 
             VStack {
                 Text(text).foregroundColor(effectiveColorScheme == .light ? Color.white : Color.black).font(.body).frame(width: 200-8)
