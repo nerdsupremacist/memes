@@ -2,6 +2,7 @@
 import Foundation
 import TokamakDOM
 import Model
+import JavaScriptKit
 
 struct GameView: View {
     @ObservedObject
@@ -22,6 +23,39 @@ struct GameView: View {
         case .done:
             HighscoreListView(game: game)
         }
+    }
+}
+
+struct InviteUserButton: View {
+    let game: Game
+
+    @State
+    var isCopying = false
+
+    @State
+    var timer: JSTimer?
+
+    func copy() {
+        guard !isCopying else { return }
+
+        let window = JSObject.global.window.object!
+        guard var components = window["location"].object?["href"].string.flatMap(URLComponents.init(string:)) else { return }
+        components.queryItems = game.gameID.map { [URLQueryItem(name: "id", value: $0.rawValue)] }
+
+        if let string = components.string {
+            let clipboard = JSObject.global.navigator.object!["clipboard"].object!
+            _ = clipboard.writeText!(string)
+        }
+
+        isCopying = true
+
+        timer = JSTimer(millisecondsDelay: 1_000) {
+            isCopying = false
+        }
+    }
+
+    var body: some View {
+        ButtonWithNumberKeyPress(isCopying ? "Link Copied!" : "Invite Friends", character: "C") { copy() }
     }
 }
 
@@ -77,23 +111,33 @@ struct WaitingToStartView: View {
                 Text("Room ID: \(id.rawValue)").font(.callout).foregroundColor(.secondary)
             }
 
-            if let player = game.current {
-                Spacer().frame(width: 0, height: 4)
-                Text("You").font(.title3).foregroundColor(.primary)
-                Text("\(player.emoji) \(player.name)").font(.callout)
-            }
-
-            if !game.otherPlayers.isEmpty {
-                Spacer().frame(width: 0, height: 4)
-                Text("Rest").font(.title3).foregroundColor(.primary)
-                ForEach(game.otherPlayers, id: \.id) { player in
+            VStack {
+                if let player = game.current {
+                    Spacer().frame(width: 0, height: 4)
+                    Text("You").font(.title3).foregroundColor(.primary)
                     Text("\(player.emoji) \(player.name)").font(.callout)
+                }
+
+                if !game.otherPlayers.isEmpty {
+                    Spacer().frame(width: 0, height: 4)
+                    Text("Rest").font(.title3).foregroundColor(.primary)
+                    ForEach(game.otherPlayers, id: \.id) { player in
+                        Text("\(player.emoji) \(player.name)").font(.callout)
+                    }
+                } else {
+                    EmptyView()
                 }
             }
 
-            if game.current?.isHost == true, game.otherPlayers.count > 1 {
-                Spacer().frame(width: 0, height: 32)
-                ButtonWithNumberKeyPress("Start Game", character: .enter, action: { game.start() })
+            Spacer().frame(width: 0, height: 32)
+
+            HStack {
+                InviteUserButton(game: game)
+
+                if game.current?.isHost == true, game.otherPlayers.count > 1 {
+                    Spacer().frame(width: 16, height: 0)
+                    ButtonWithNumberKeyPress("Start Game", character: .enter, action: { game.start() })
+                }
             }
         }
     }
