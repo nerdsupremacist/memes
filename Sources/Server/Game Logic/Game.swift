@@ -142,6 +142,7 @@ class Game {
 
             if player.isHost, let newHost = players.first {
                 newHost.isHost = true
+                host = newHost
                 send(event: .newHost(player: newHost))
             }
 
