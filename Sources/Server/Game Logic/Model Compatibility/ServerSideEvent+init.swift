@@ -42,7 +42,7 @@ extension ServerSideEvent {
     }
 
     static func choosing(_ meme: Meme) -> ServerSideEvent {
-        return .choosing(ChoosingMeme(proposals: meme.proposedLines.map { $0.text }))
+        return .choosing(ChoosingMeme(proposals: meme.proposedLines.map { $0.text }.shuffled()))
     }
 
     static func chosen(_ meme: Meme) -> ServerSideEvent {
