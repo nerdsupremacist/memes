@@ -14,7 +14,10 @@ class WebSocket {
 
         var closure: JSClosure?
         closure = JSClosure { [weak self] _ -> Void in
-            guard let self = self else { return }
+            guard let self = self else {
+                closure?.release()
+                return
+            }
             self.isOpen = true
             for message in self.queue {
                 self.send(message)
