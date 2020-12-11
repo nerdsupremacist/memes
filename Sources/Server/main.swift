@@ -35,9 +35,6 @@ extension Game {
 
     static func handle(event: ClientEvent, for gameRef: inout Game?, from playerRef: inout Player?, using socket: WebSocket) {
         switch (event, gameRef, playerRef) {
-        case (.deregister, .none, .some):
-            playerRef = nil
-            
         case (.configure(let rounds), .none, _):
             let game = Game(rounds: rounds) { game in
                 lock.withLock {
