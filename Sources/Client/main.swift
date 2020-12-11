@@ -1,6 +1,6 @@
+
 import Foundation
 import TokamakDOM
-import OpenCombine
 import JavaScriptKit
 import Model
 
@@ -14,19 +14,19 @@ span {
 """#)
 
 struct Memes: App {
-    let game: Game
+    let session: Session
 
     init() {
         #if DEBUG
-        game = Game(id: gameIDFromURL(), webSocket: WebSocket(url: URL(string: "ws://localhost:3000/game")!))
+        session = Session(id: gameIDFromURL(), url: URL(string: "ws://localhost:3000/game")!)
         #else
-        game = Game(id: gameIDFromURL(), webSocket: WebSocket(url: URL(string: "wss://memes.apps.quintero.io/game")!))
+        session = Session(id: gameIDFromURL(), url: URL(string: "wss://memes.apps.quintero.io/game")!)
         #endif
     }
 
     var body: some Scene {
         WindowGroup("Memes") {
-            GameRootView(game: game)
+            RootView(session: session)
         }
     }
 }

@@ -5,19 +5,17 @@ import Model
 import JavaScriptKit
 
 struct GameRootView: View {
+    let session: Session
+
     @ObservedObject
     var game: Game
 
     var body: some View {
-        switch (game.state, game.error, game.gameID, game.current) {
-        case (_, .some(let error), _, _):
-            ErrorView(error: error, game: game)
-        case (_, .none, .some, .some):
-            GameView(game: game)
-        case (_, .none, .none, .none):
-            GameStartView(game: game)
-        case (_, .none, .some, .none):
+        switch (game.gameID, game.current) {
+        case (.some, .none):
             RegisterUserView(game: game)
+        case (.some, .some):
+            GameView(game: game)
         default:
             Text("Loading...")
         }

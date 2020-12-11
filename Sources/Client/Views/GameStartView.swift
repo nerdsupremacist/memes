@@ -5,7 +5,7 @@ import Model
 
 struct GameStartView: View {
     @ObservedObject
-    var game: Game
+    var session: Session
 
     @State
     private var kind: Kind? = nil
@@ -20,9 +20,9 @@ struct GameStartView: View {
         case .none:
             ChooseKindView(kind: $kind)
         case .some(.start):
-            StartANewGameView(game: game)
+            StartANewGameView(session: session)
         case .some(.join):
-            JoinAGameView(game: game)
+            JoinAGameView(session: session)
         }
     }
 }
@@ -33,15 +33,19 @@ private struct ChooseKindView: View {
 
     var body: some View {
         VStack {
-            Text("Welcome!").font(.title).fontWeight(.heavy)
-            Text("This is a game where you pick the captions for memes.").font(.callout).fontWeight(.regular)
-            Text("One person get's to decide which is the funniest.").font(.callout).fontWeight(.regular)
+            Spacer()
+
+            VStack {
+                Text("Welcome!").font(.title).fontWeight(.heavy)
+                Text("This is a game where you pick the captions for memes.").font(.callout).fontWeight(.regular)
+                Text("One person get's to decide which is the funniest.").font(.callout).fontWeight(.regular)
+            }
 
             Spacer().frame(width: 0, height: 16)
 
             Text("Let's see who the funniest/most horrible person in your group is...").font(.callout).fontWeight(.regular)
 
-            Spacer().frame(width: 0, height: 4)
+            Spacer().frame(width: 0, height: 8)
 
             HStack {
                 ButtonWithNumberKeyPress("Start a Game", character: "1") {
@@ -52,18 +56,23 @@ private struct ChooseKindView: View {
                     kind = .join
                 }
             }
+
+            Spacer()
+
+            Text("P.S.: If you're one of those who hates using a mouse, underneath every button is a label with the key you can press instead").font(.callout).fontWeight(.regular)
+            Spacer().frame(width: 0, height: 16)
         }
     }
 }
 
 struct JoinAGameView: View {
-    var game: Game
+    var session: Session
 
     @State
     private var room = ""
 
     func start() {
-        game.join(id: GameID(rawValue: room))
+        session.join(id: GameID(rawValue: room))
     }
 
     var body: some View {
@@ -80,10 +89,10 @@ struct JoinAGameView: View {
 
 struct NumberOfRoundsButton: View {
     let number: Int
-    let game: Game
+    let session: Session
 
     var body: some View {
-        ButtonWithNumberKeyPress(character: String(number % 10).first!, action: { game.configure(rounds: number) }) {
+        ButtonWithNumberKeyPress(character: String(number % 10).first!, action: { session.configure(rounds: number) }) {
             NumberOfRoundsContent(number: number)
         }
     }
@@ -106,7 +115,7 @@ struct NumberOfRoundsContent: View {
 }
 
 struct StartANewGameView: View {
-    let game: Game
+    let session: Session
 
     var body: some View {
         VStack {
@@ -119,7 +128,7 @@ struct StartANewGameView: View {
 
             HStack {
                 ForEach(0..<10) { number in
-                    NumberOfRoundsButton(number: number + 1, game: game)
+                    NumberOfRoundsButton(number: number + 1, session: session)
                 }
             }
         }

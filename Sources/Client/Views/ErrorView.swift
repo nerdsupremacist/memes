@@ -6,17 +6,17 @@ import Model
 
 struct ErrorView: View {
     let error: GameError
-    let game: Game
+    let session: Session
 
     var body: some View {
         VStack {
             Text("An Error Occurred").font(.title).foregroundColor(.primary)
-            Text(error.errorDescription(game: game)).font(.callout).foregroundColor(.secondary)
+            Text(error.errorDescription()).font(.callout).foregroundColor(.secondary)
 
             Spacer().frame(width: 0, height: 32)
 
             ButtonWithNumberKeyPress("Continue", character: .space) {
-                game.error = nil
+                session.clearError()
             }
         }
     }
@@ -24,35 +24,22 @@ struct ErrorView: View {
 
 extension GameError {
 
-    func errorDescription(game: Game) -> String {
+    func errorDescription() -> String {
         switch self {
         case .gameNotFound:
             return "Game Not Found"
         case .onlyTheHostCanStart:
-            let host = game.otherPlayers.first { $0.isHost }!
-            return "Only the host can start the game (\(host.name))"
+            return "Only the host can start the game"
         case .onlyTheHostCanEnd:
-            let host = game.otherPlayers.first { $0.isHost }!
-            return "Only the host can end the game (\(host.name))"
+            return "Only the host can end the game"
         case .tooManyPlayersDroppedOut:
             return "Too many players dropped out of the game"
         case .gameCanOnlyStartWithAMinimumOfThreePlayers:
-            return "Cannot start with less than 3 players (\(game.otherPlayers.count + 1) players)"
+            return "Cannot start with less than 3 players"
         case .judgeCannotPlayACard:
             return "You cannot play a card as a Judge"
         case .onlyJudgeCanChoose:
-            let judge: Player
-            switch game.state {
-            case .choosing(let meme):
-                judge = meme.judge
-            case .freestyle(let meme):
-                judge = meme.judge
-            case .collecting(let meme):
-                judge = meme.judge
-            default:
-                fatalError()
-            }
-            return "Only the judge (\(judge.name)) can choose the winning card"
+            return "Only the judge can choose the winning card"
         case .cannotPlayACardNotInTheHand:
             return "You played a card that wasn't in your hand"
         case .cannotPlayTwiceForTheSameCard:

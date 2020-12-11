@@ -71,14 +71,9 @@ class Game: ObservableObject {
     private let webSocket: WebSocket
     private var cancellables: Set<AnyCancellable> = []
 
-    init(id: GameID? = nil, webSocket: WebSocket) {
+    init(webSocket: WebSocket) {
         self.webSocket = webSocket
         setup()
-
-        if let id = id {
-            send(event: .join(id: id))
-            self.gameID = id
-        }
     }
 
     private func send(event: ClientEvent) {
@@ -198,7 +193,6 @@ extension Game {
 
     func join(id: GameID) {
         error = nil
-        self.gameID = id
         send(event: .join(id: id))
     }
 
