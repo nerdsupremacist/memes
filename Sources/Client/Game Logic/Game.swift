@@ -36,16 +36,10 @@ class Game: ObservableObject {
     @Published
     private(set) var gameID: GameID? {
         didSet {
-            let window = JSObject.global.window.object!
-            guard var components = window["location"].object?["href"].string.flatMap(URLComponents.init(string:)) else { return }
-            let withoutID = components.queryItems?.filter { $0.name != "id" } ?? []
-            let idParam = gameID.map { [URLQueryItem(name: "id", value: $0.rawValue)] } ?? []
-            components.queryItems = idParam + withoutID
-            if components.query!.isEmpty {
-                components.queryItems = nil
-            }
-            if let string = components.string {
-                _ = window["history"].object!.replaceState?([:], "", string)
+            changeQueryParameters { queryItems in
+                let withoutID = queryItems.filter { $0.name != "id" }
+                let idParam = gameID.map { [URLQueryItem(name: "id", value: $0.rawValue)] } ?? []
+                return idParam + withoutID
             }
         }
     }
