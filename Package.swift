@@ -21,6 +21,7 @@ let package = Package(
                     .product(name: "Vapor", package: "vapor"),
                     .target(name: "Model"),
                     .target(name: "Events"),
+                    .target(name: "Deck")
                 ]),
         .target(
             name: "Client",
@@ -30,6 +31,7 @@ let package = Package(
                 .target(name: "Events"),
             ]),
         .target(name: "Events", dependencies: [.target(name: "Model")]),
+        .target(name: "Deck", dependencies: [.target(name: "Model")]),
         .target(name: "Model"),
     ]
 )

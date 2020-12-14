@@ -2,6 +2,7 @@
 import Foundation
 import Events
 import Model
+import Deck
 
 class Game {
     enum State {
@@ -98,7 +99,7 @@ class Game {
         return !players.isEmpty
     }
 
-    init(rounds: Int, deck: Deck = StandardDeck.basic, gameEndCompletion: @escaping (Game) -> Void) {
+    init(rounds: Int, deck: Deck = StandardDeck.main, gameEndCompletion: @escaping (Game) -> Void) {
         self.rounds = rounds
         self.deck = deck
         self.gameEndCompletion = gameEndCompletion
@@ -213,11 +214,11 @@ class Game {
         players.shuffle()
         for player in players {
             for _ in 0..<7 {
-                player.cards.append(deck.card(for: player, in: self))
+                player.cards.append(deck.card())
             }
             player.send(event: .newCards(player.cards))
         }
-        state = .collecting(deck.meme(for: players[judgeIndex], in: self))
+        state = .collecting(deck.meme(for: players[judgeIndex]))
     }
 
     private func play(card: Card, for meme: Meme, as player: Player) {
@@ -243,7 +244,7 @@ class Game {
             play(text: text, for: meme, as: player)
         }
 
-        let newCard = deck.card(for: player, in: self)
+        let newCard = deck.card()
         player.cards.append(newCard)
         player.send(event: .newCards([newCard]))
     }
@@ -281,7 +282,7 @@ class Game {
         if (judgeIndex == 0 && history.count >= rounds * players.count) {
             state = .done
         } else {
-            state = .collecting(deck.meme(for: players[judgeIndex], in: self))
+            state = .collecting(deck.meme(for: players[judgeIndex]))
         }
     }
 
@@ -304,4 +305,12 @@ class Game {
             player.stop()
         }
     }
+}
+
+extension Deck {
+
+    func meme(for judge: Player) -> Meme {
+        return Meme(judge: judge, image: meme())
+    }
+
 }
