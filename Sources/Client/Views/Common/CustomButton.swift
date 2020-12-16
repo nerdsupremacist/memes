@@ -43,7 +43,8 @@ struct CustomButton<Content : View>: View {
             Spacer().frame(width: 0, height: 4)
 
             ZStack {
-                RoundedRectangle(cornerRadius: 5).fill(colorScheme == .light ? Color.black : Color.white)
+                RoundedRectangle(cornerRadius: 5)
+                    .fill(colorScheme == .light ? Color.black : Color.white)
                     .frame(width: 30, height: 30)
 
                 switch character {

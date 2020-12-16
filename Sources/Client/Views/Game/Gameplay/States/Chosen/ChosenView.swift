@@ -35,7 +35,7 @@ struct ChosenView: View {
                 VStack {
                     Text("Winner:").font(.title3).foregroundColor(.primary)
                     Spacer().frame(width: 0, height: 8)
-                    CardContentView(card: .text(meme.winner.text))
+                    CardContentView(card: .text(meme.winner.text), height: 300)
                     Spacer().frame(width: 0, height: 8)
                     Text("\(meme.winner.player.emoji) \(meme.winner.player.name)").font(.callout)
                     Text("\(meme.winner.player.winCount) Points").font(.callout)

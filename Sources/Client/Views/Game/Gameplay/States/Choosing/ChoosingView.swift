@@ -30,14 +30,14 @@ struct ChoosingView: View {
             if let current = game.current, meme.judge.id != current.id {
                 HStack {
                     ForEach(meme.submissions, id: \.self) { submission in
-                        CardContentView(card: .text(submission)).padding(.horizontal, 8)
+                        CardContentView(card: .text(submission), height: 300).padding(.horizontal, 8)
                     }
                 }
             } else {
                 HStack {
                     ForEach(meme.submissions.indices, id: \.self) { index in
                         CustomButton(character: String(index + 1).first!, action: { game.choose(text: meme.submissions[index]) }) {
-                            CardContentView(card: .text(meme.submissions[index]))
+                            CardContentView(card: .text(meme.submissions[index]), height: 300)
                         }
                     }
                 }

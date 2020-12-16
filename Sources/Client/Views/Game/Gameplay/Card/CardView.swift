@@ -7,6 +7,7 @@ struct CardView: View {
     let game: Game
     let card: Card
     let index: Int
+    let height: Double
 
     @Environment(\.colorScheme)
     var colorScheme
@@ -37,7 +38,8 @@ struct CardView: View {
 
     var body: some View {
         CustomButton(character: String(index + 1).first!, action: { game.play(card: card) }) {
-            CardContentView(card: card)
+            CardContentView(card: card, height: height - 46)
         }
+        .frame(height: height)
     }
 }

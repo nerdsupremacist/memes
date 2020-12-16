@@ -5,6 +5,7 @@ import Model
 
 struct CardContentView: View {
     let card: Card
+    let height: Double
 
     @Environment(\.colorScheme)
     var colorScheme
@@ -37,16 +38,18 @@ struct CardContentView: View {
         ZStack {
             RoundedRectangle(cornerRadius: 21)
                 .fill(effectiveColorScheme == .light ? Color.white : Color.black)
-                .frame(width: 200, height: 300)
+                .frame(width: 2 / 3 * height, height: height)
 
             RoundedRectangle(cornerRadius: 20)
                 .fill(effectiveColorScheme == .light ? Color.black : Color.white)
-                .frame(width: 198, height: 298)
+                .frame(width: 2 / 3 * height - 2, height: height - 2)
 
             VStack {
-                Text(text).foregroundColor(effectiveColorScheme == .light ? Color.white : Color.black).font(.body).frame(width: 200-8)
+                Text(text)
+                    .foregroundColor(effectiveColorScheme == .light ? Color.white : Color.black)
+                    .font(.body)
+                    .frame(width: 2 / 3 * height - 16)
             }
         }
-        .frame(width: 200, height: 300)
     }
 }
