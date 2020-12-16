@@ -87,6 +87,15 @@ class Game {
         }
     }
 
+    var isRunning: Bool {
+        switch state {
+        case .initialized, .done:
+            return false
+        default:
+            return true
+        }
+    }
+
     var hasStopped: Bool {
         if case .stopped = state {
             return true
@@ -135,7 +144,7 @@ class Game {
                 return
             }
 
-            if hasStarted, players.count < 3 {
+            if !isRunning, players.count < 3 {
                 send(event: .error(.tooManyPlayersDroppedOut))
                 stop()
                 return
