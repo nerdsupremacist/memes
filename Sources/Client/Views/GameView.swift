@@ -37,14 +37,11 @@ struct InviteUserButton: View {
 
     func copy() {
         guard !isCopying else { return }
-
-        let window = JSObject.global.window.object!
-        guard var components = window["location"].object?["href"].string.flatMap(URLComponents.init(string:)) else { return }
+        guard var components = URLComponents.current else { return }
         components.queryItems = game.gameID.map { [URLQueryItem(name: "id", value: $0.rawValue)] }
 
         if let string = components.string {
-            let clipboard = JSObject.global.navigator.object!["clipboard"].object!
-            _ = clipboard.writeText!(string)
+            Clipboard.write(string)
         }
 
         isCopying = true

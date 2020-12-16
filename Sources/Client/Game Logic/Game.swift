@@ -1,5 +1,4 @@
 import Foundation
-import JavaScriptKit
 import Model
 import Events
 import CombineShim
@@ -36,7 +35,7 @@ class Game: ObservableObject {
     @Published
     private(set) var gameID: GameID? {
         didSet {
-            changeQueryParameters { queryItems in
+            URLComponents.changeQueryParameters { queryItems in
                 let withoutID = queryItems.filter { $0.name != "id" }
                 let idParam = gameID.map { [URLQueryItem(name: "id", value: $0.rawValue)] } ?? []
                 return idParam + withoutID

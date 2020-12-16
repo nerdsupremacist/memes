@@ -2,7 +2,6 @@
 import Foundation
 import TokamakDOM
 import Model
-import JavaScriptKit
 
 struct GameRootView: View {
     let session: Session

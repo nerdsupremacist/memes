@@ -41,8 +41,7 @@ struct Memes: App {
 }
 
 private func gameIDFromURL() -> GameID? {
-    let window = JSObject.global.window.object!
-    guard let components = window["location"].object?["href"].string.flatMap(URLComponents.init(string:)) else { return nil }
+    guard let components = URLComponents.current else { return nil }
     return components.queryItems?.first { $0.name == "id" }?.value.map(GameID.init(rawValue:))
 }
 

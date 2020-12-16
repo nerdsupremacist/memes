@@ -32,7 +32,7 @@ class Session: ObservableObject {
             .onClose()
             .sink { [unowned self] in
                 self.game = nil
-                changeQueryParameters { $0.filter { $0.name != "id" } }
+                URLComponents.changeQueryParameters { $0.filter { $0.name != "id" } }
             }
             .store(in: &cancellables)
 
