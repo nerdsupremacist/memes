@@ -48,11 +48,11 @@ private struct ChooseKindView: View {
             Spacer().frame(width: 0, height: 8)
 
             HStack {
-                ButtonWithNumberKeyPress("Start a Game", character: "1") {
+                CustomButton("Start a Game", character: "1") {
                     kind = .start
                 }
 
-                ButtonWithNumberKeyPress("Join a Game", character: "2") {
+                CustomButton("Join a Game", character: "2") {
                     kind = .join
                 }
             }
@@ -92,7 +92,7 @@ struct NumberOfRoundsButton: View {
     let session: Session
 
     var body: some View {
-        ButtonWithNumberKeyPress(character: String(number % 10).first!, action: { session.configure(rounds: number) }) {
+        CustomButton(character: String(number % 10).first!, action: { session.configure(rounds: number) }) {
             NumberOfRoundsContent(number: number)
         }
     }

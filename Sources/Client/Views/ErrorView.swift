@@ -15,7 +15,7 @@ struct ErrorView: View {
 
             Spacer().frame(width: 0, height: 32)
 
-            ButtonWithNumberKeyPress("Continue", character: .space) {
+            CustomButton("Continue", character: .space) {
                 session.clearError()
             }
         }

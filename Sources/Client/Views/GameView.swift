@@ -55,7 +55,7 @@ struct InviteUserButton: View {
     }
 
     var body: some View {
-        ButtonWithNumberKeyPress(isCopying ? "Link Copied!" : "Invite Friends", character: "C") { copy() }
+        CustomButton(isCopying ? "Link Copied!" : "Invite Friends", character: "C") { copy() }
     }
 }
 
@@ -94,7 +94,7 @@ struct HighscoreListView: View {
 
             if game.current?.isHost == true {
                 Spacer().frame(width: 0, height: 32)
-                ButtonWithNumberKeyPress("Play again", character: .enter, action: { game.playAgain() })
+                CustomButton("Play again", character: .enter, action: { game.playAgain() })
             }
         }
     }
@@ -136,7 +136,7 @@ struct WaitingToStartView: View {
 
                 if game.current?.isHost == true, game.otherPlayers.count > 1 {
                     Spacer().frame(width: 16, height: 0)
-                    ButtonWithNumberKeyPress("Start Game", character: .enter, action: { game.start() })
+                    CustomButton("Start Game", character: .enter, action: { game.start() })
                 }
             }
         }
@@ -177,7 +177,7 @@ struct ChoosingView: View {
             } else {
                 HStack {
                     ForEach(meme.submissions.indices, id: \.self) { index in
-                        ButtonWithNumberKeyPress(character: String(index + 1).first!, action: { game.choose(text: meme.submissions[index]) }) {
+                        CustomButton(character: String(index + 1).first!, action: { game.choose(text: meme.submissions[index]) }) {
                             CardContentView(card: .text(meme.submissions[index]))
                         }
                     }
@@ -336,7 +336,7 @@ struct ChosenView: View {
             Spacer()
 
 
-            ButtonWithNumberKeyPress("Next", character: .enter) { game.continue() }
+            CustomButton("Next", character: .enter) { game.continue() }
 
             Spacer().frame(width: 0, height: 64)
         }
@@ -376,7 +376,7 @@ struct CardView: View {
     }
 
     var body: some View {
-        ButtonWithNumberKeyPress(character: String(index + 1).first!, action: { game.play(card: card) }) {
+        CustomButton(character: String(index + 1).first!, action: { game.play(card: card) }) {
             CardContentView(card: card)
         }
     }

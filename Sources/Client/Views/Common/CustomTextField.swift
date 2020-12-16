@@ -1,9 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Mathias Quintero on 12/9/20.
-//
 
 import Foundation
 import TokamakDOM
