@@ -20,7 +20,7 @@ public class StandardDeck: Deck {
     }
 
     public func card() -> Card {
-        if Int.random(in: 0...100) < 1 {
+        if Int.random(in: 0...100) < 2 {
             return .freestyle
         }
 
