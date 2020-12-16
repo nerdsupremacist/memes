@@ -144,7 +144,7 @@ class Game {
                 return
             }
 
-            if !isRunning, players.count < 3 {
+            if isRunning, players.count < 3 {
                 send(event: .error(.tooManyPlayersDroppedOut))
                 stop()
                 return
