@@ -6,8 +6,8 @@ extension CustomButton where Content == StandardButtonContent {
 
     init(_ text: String,
          character: Character,
-         width: CGFloat = 200,
-         height: CGFloat = 70,
+         width: Double = 200,
+         height: Double = 70,
          action: @escaping () -> Void) {
 
         self.init(character: character, action: action) {
