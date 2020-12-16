@@ -10,6 +10,7 @@ let package = Package(
         .executable(name: "memes-server",
                     targets: ["Server"]),
         .executable(name: "memes-client", targets: ["Client"]),
+        .executable(name: "DeckApp", targets: ["DeckApp"]),
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
@@ -29,6 +30,13 @@ let package = Package(
                 .product(name: "TokamakShim", package: "Tokamak"),
                 .target(name: "Model"),
                 .target(name: "Events"),
+            ]),
+
+        .target(
+            name: "DeckApp",
+            dependencies: [
+                .target(name: "Model"),
+                .target(name: "Deck"),
             ]),
         .target(name: "Events", dependencies: [.target(name: "Model")]),
         .target(name: "Deck", dependencies: [.target(name: "Model")]),
