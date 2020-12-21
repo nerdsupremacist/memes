@@ -3,12 +3,10 @@ import Cocoa
 import SwiftUI
 
 extension NSApplication {
-    public func run<V: View>(@ViewBuilder view: () -> V) {
-        let appDelegate = AppDelegate(view())
+    public func run<A: App>(_ app: A.Type) {
         NSApp.setActivationPolicy(.regular)
         mainMenu = customMenu
-        delegate = appDelegate
-        run()
+        app.main()
     }
 }
 
@@ -44,29 +42,5 @@ extension NSApplication {
         mainMenu.addItem(appMenu)
         mainMenu.addItem(windowMenu)
         return mainMenu
-    }
-}
-
-class AppDelegate<V: View>: NSObject, NSApplicationDelegate, NSWindowDelegate {
-    init(_ contentView: V) {
-        self.contentView = contentView
-
-    }
-    var window: NSWindow!
-    var hostingView: NSView?
-    var contentView: V
-
-    func applicationDidFinishLaunching(_ notification: Notification) {
-        window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 480, height: 300),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
-            backing: .buffered, defer: false)
-        window.center()
-        window.setFrameAutosaveName("Main Window")
-        hostingView = NSHostingView(rootView: contentView)
-        window.contentView = hostingView
-        window.makeKeyAndOrderFront(nil)
-        window.delegate = self
-        NSApp.activate(ignoringOtherApps: true)
     }
 }
