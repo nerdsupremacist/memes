@@ -17,6 +17,9 @@ struct DeckApp: App {
         WindowGroup {
             RootView(decks: decks)
         }
+        .commands {
+            SidebarCommands()
+        }
     }
 }
 
