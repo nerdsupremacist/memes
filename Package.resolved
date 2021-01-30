@@ -164,6 +164,15 @@
         }
       },
       {
+        "package": "URLImage",
+        "repositoryURL": "https://github.com/dmytro-anokhin/url-image.git",
+        "state": {
+          "branch": null,
+          "revision": "7455e7b59087322975fce21e83c2ffaf6e0fa04a",
+          "version": "2.2.1"
+        }
+      },
+      {
         "package": "vapor",
         "repositoryURL": "https://github.com/vapor/vapor.git",
         "state": {

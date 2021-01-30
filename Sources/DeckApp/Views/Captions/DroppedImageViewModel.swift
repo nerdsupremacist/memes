@@ -41,7 +41,7 @@ class DroppedImageViewModel: ObservableObject, DropDelegate {
     }
 
     func performDrop(info: DropInfo) -> Bool {
-        if let item = info.itemProviders(for: [.fileURL]).first {
+        if let item = info.itemProviders(for: [.image, .png, .jpeg, .rawImage, .webP, .aiff, .fileURL]).first {
             start(with: item)
             return true
         }
@@ -50,12 +50,23 @@ class DroppedImageViewModel: ObservableObject, DropDelegate {
 
     private func start(with item: NSItemProvider) {
         guard !isLoading else { return }
-        item.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { data, error in
-            guard let data = data as? Data,
-                  let url = URL(dataRepresentation: data, relativeTo: nil),
-                  let image = NSImage(contentsOf: url) else { return }
 
-            self.start(with: image)
+        item.loadItem(for: [.image, .png, .jpeg, .rawImage, .webP, .aiff, .fileURL]) { result, type in
+            guard case .success(let data) = result else { return }
+            switch type {
+            case .url, .fileURL:
+                guard let url = URL(dataRepresentation: data, relativeTo: nil),
+                      let image = NSImage(contentsOf: url) else { return }
+
+                self.start(with: image)
+
+            case .image, .png, .jpeg, .rawImage, .webP, .aiff:
+                guard let image = NSImage(data: data) else { return }
+                self.start(with: image)
+
+            default:
+                fatalError()
+            }
         }
     }
 
@@ -79,4 +90,26 @@ class DroppedImageViewModel: ObservableObject, DropDelegate {
             try! handler.perform([request])
         }
     }
+}
+
+extension NSItemProvider {
+
+    func loadItem(for types: [UTType], block: @escaping (Result<Data, Error>, UTType) -> Void) {
+        for type in types {
+            if hasItemConformingToTypeIdentifier(type.identifier) {
+                loadItem(forTypeIdentifier: type.identifier, options: nil) { data, error in
+                    switch (data, error) {
+                    case (let data as Data, .none):
+                        block(.success(data), type)
+                    case (_, .some(let error)):
+                        block(.failure(error), type)
+                    default:
+                        fatalError()
+                    }
+                }
+                return
+            }
+        }
+    }
+
 }

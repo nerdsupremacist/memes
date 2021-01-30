@@ -10,9 +10,9 @@ struct RootView: View {
             List {
                 ForEach(decks, id: \.name) { deck in
                     Section(header: Text(deck.name.capitalized)) {
-//                        NavigationLink(destination: CaptionListView(deck: deck)) {
-//                            Label("Memes", systemImage: "camera.fill")
-//                        }
+                        NavigationLink(destination: MemeListView(deck: deck)) {
+                            Label("Memes", systemImage: "camera.fill")
+                        }
 
                         NavigationLink(destination: CaptionListView(deck: deck)) {
                             Label("Captions", systemImage: "doc.text")

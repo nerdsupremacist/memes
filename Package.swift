@@ -15,6 +15,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
         .package(name: "Tokamak", url: "https://github.com/TokamakUI/Tokamak", from: "0.6.0"),
+        .package(name: "URLImage", url: "https://github.com/dmytro-anokhin/url-image.git", from: "2.0.0")
     ],
     targets: [
         .target(name: "Server",
@@ -37,8 +38,14 @@ let package = Package(
             dependencies: [
                 .target(name: "Model"),
                 .target(name: "Deck"),
+                .product(name: "URLImage", package: "URLImage"),
             ]),
-        .target(name: "Events", dependencies: [.target(name: "Model")]),
+        .target(
+            name: "Events",
+            dependencies: [
+                .target(name: "Model"),
+            ]
+        ),
         .target(name: "Deck", dependencies: [.target(name: "Model")]),
         .target(name: "Model"),
     ]

@@ -45,7 +45,7 @@ struct CaptionListView: View {
                 .frame(width: 400, height: 300)
             }
         }
-        .onDrop(of: [.fileURL, .image], delegate: droppedImage)
+        .onDrop(of: [.image, .png, .jpeg, .rawImage, .webP, .aiff, .fileURL], delegate: droppedImage)
         .navigationTitle("\(deck.name.capitalized) - Captions (\(deck.captions.count))")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
